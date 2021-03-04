@@ -1,0 +1,10 @@
+*.ts
+!*.d.ts
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+# Ignore the api and web app, it will have its own npm packages
+lib/App/**/
+
