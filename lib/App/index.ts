@@ -115,33 +115,6 @@ export class APIStack extends cdk.Stack {
 
         alb.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '10')
 
-        new elbv2.CfnListenerRule(this, 'LoadBalancertestAPIDispatchRule', {
-            priority: 30,
-            listenerArn: alb.listener.listenerArn,
-            conditions: [
-                {
-                    field: 'path-pattern',
-                    values: ['/secret']
-                }
-            ],
-            actions: [
-                {
-                    type:'authenticate-cognito',
-                    order: 100,
-                    authenticateCognitoConfig: {
-                        userPoolArn: props.user!.Pool.userPoolArn,
-                        userPoolClientId: props.user!.Client.userPoolClientId,
-                        userPoolDomain: props.user!.Domain.domainName,
-                        onUnauthenticatedRequest: 'deny'
-                    }
-                }, {
-                    type: 'forward',
-                    order: 200,
-                    targetGroupArn: alb.targetGroup.targetGroupArn
-                }
-            ]
-        })
-
         new elbv2.CfnListenerRule(this, 'LoadBalancerAPIDispatchRule', {
             priority: 20,
             listenerArn: alb.listener.listenerArn,
@@ -169,6 +142,9 @@ export class APIStack extends cdk.Stack {
             ]
         })
 
+        /**
+         * This might need to be removed in production apps, we don't want them to login to the api. But rather, through the auth endpoint.
+         */
         new elbv2.CfnListenerRule(this, 'LoadBalancerLoginDispatchRule', {
             priority: 10,
             listenerArn: alb.listener.listenerArn,
@@ -195,47 +171,6 @@ export class APIStack extends cdk.Stack {
                 }
             ]
         })
-
-        // const apiDispatchRule = new elbv2.ApplicationListenerRule(this, 'apiRule', {
-        //     listener: alb.listener,
-        //     priority: 20,
-        //     conditions: [
-        //         ListenerCondition.pathPatterns(['/graphql/*']),
-        //     ],
-        //     action: ListenerAction.authenticateOidc({
-        //         authorizationEndpoint: "https://auth.liveworks.app",
-        //         clientId: '',
-        //         clientSecret: '',
-        //         issuer: '',
-        //         next: ,
-                
-        //     })
-        // })
-
-        // const clientSecret = cdk.SecretValue.secretsManager('clientSecret', {})
-
-        // const action = elbv2.ListenerAction.authenticateOidc({
-        //     authorizationEndpoint: 'https://www.liveworks.app/login',
-        //     clientId: 'random',
-        //     clientSecret: clientSecret,
-        //     issuer: 'someone',
-        //     next: elbv2.ListenerAction.forward([alb.targetGroup]),
-        //     tokenEndpoint: '',
-        //     userInfoEndpoint: '',
-        // })
-
-        // const conditions = [
-        //     elbv2.ListenerCondition.hostHeaders(['https://www.liveworks.app'])
-        // ]
-
-        // new elbv2.ApplicationListenerRule(this, 'ALBListener', {
-        //     listener: alb.listener,
-        //     priority: 1000,
-        //     action,
-        //     conditions
-
-        // })
-
 
     }
 }

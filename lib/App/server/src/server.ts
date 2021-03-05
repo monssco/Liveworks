@@ -36,7 +36,8 @@ const startServer = async () => {
         https://github.com/benawad/lireddit/blob/18_change-password/server/src/index.ts
     */
     const server = new ApolloServer({
-        
+        playground: true,
+        introspection: true,
         schema,
         context: ({req, res}) : MyContext => ({
             em: client.em,
@@ -44,15 +45,6 @@ const startServer = async () => {
             res
         })
     })
-
-    // const server = new ApolloServer({ typeDefs, 
-    //     resolvers, 
-    //     context: ({ req }) => {
-    //         console.log("Request:",req.headers)
-    //         return {
-    //             client: dbClient
-    //         }
-    // } });
 
     const app = express();
 

@@ -109,17 +109,6 @@ export class CognitoStack extends cdk.Stack {
             target: route53.RecordTarget.fromAlias(new route53_targets.UserPoolDomainTarget(userPoolDomain)),
         });
 
-        const cfnUserPool = userPool.node.defaultChild as cognito.CfnUserPool;
-
-        // cfnUserPool.policies = {
-        //     passwordPolicy: {
-        //         minimumLength: 8,
-        //         requireLowercase: false,
-        //         requireNumbers: false,
-        //         requireUppercase: false,
-        //         requireSymbols: false
-        //     }
-        // };
         const userPoolClient = new cognito.UserPoolClient(this, 'MyUserPoolClient', {
             generateSecret: true,
             userPool: userPool,
@@ -131,10 +120,16 @@ export class CognitoStack extends cdk.Stack {
             ],
             oAuth: {
                 callbackUrls: [
-                    'https://' + 'api.liveworks.app' + '/oauth2/idpresponse'
+                    'https://' + 'auth.liveworks.app' + '/oauth2/idpresponse',
+                    'https://auth.liveworks.app'
+                ],
+                logoutUrls: [
+                    'https://auth.liveworks.app/logout',
+                    'https://auth.liveworks.app/'
                 ],
                 flows: {
-                    authorizationCodeGrant: true
+                    authorizationCodeGrant: true,
+                    
                 },
                 scopes: [
                     {

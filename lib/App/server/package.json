@@ -19,6 +19,7 @@
       "@mikro-orm/postgresql": "^4.4.2",
       "apollo-server-express": "^2.19.2",
       "class-validator": "^0.13.1",
+      "cors": "^2.8.5",
       "dotenv": "^8.2.0",
       "graphql": "^15.5.0",
       "graphql-tools": "^7.0.2",
@@ -27,7 +28,7 @@
       "type-graphql": "^1.1.1"
    },
    "mikro-orm": {
-    "useTsNode": true
+      "useTsNode": true
    },
    "scripts": {
       "prod": "cross-env NODE_ENV=production ts-node-dev --respawn --no-notify src/server.ts",
