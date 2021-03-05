@@ -1,11 +1,13 @@
 import * as cdk from '@aws-cdk/core';
 import * as cognito from '@aws-cdk/aws-cognito';
 import * as iam from '@aws-cdk/aws-iam'
-
-import {CognitoLambda} from './Lambda/index'
-import { ICertificate } from '@aws-cdk/aws-certificatemanager';
 import * as route53 from '@aws-cdk/aws-route53';
 import * as route53_targets from '@aws-cdk/aws-route53-targets';
+import * as acm from '@aws-cdk/aws-certificatemanager';
+
+import {CognitoLambda} from './Lambda/index'
+
+
 
 // Most of stack copied from: https://stackoverflow.com/questions/55784746/how-to-create-cognito-identitypool-with-cognito-userpool-as-one-of-the-authentic
 
@@ -16,9 +18,10 @@ const USER_POOL_NAME = `USER_POOL`
  * Used if we are using a custom domain for the user pools
  */
 interface CognitoStackProps {
-    certificate?: ICertificate
-    domainName?: string
-    hostedZone?: route53.IHostedZone
+    authCertificate: acm.DnsValidatedCertificate
+    hostedZone: route53.IHostedZone
+    domain: string
+    subDomain: string
 }
 
 export class CognitoStack extends cdk.Stack {
@@ -26,8 +29,11 @@ export class CognitoStack extends cdk.Stack {
     // These roles will be used across the app for accessing various resources.
     public readonly unauthenticatedRole: iam.Role
     public readonly authenticatedRole: iam.Role
+    public readonly userPool?: cognito.UserPool
+    public readonly userPoolClient?: cognito.UserPoolClient
+    public readonly userPoolDomain?: cognito.UserPoolDomain
 
-    constructor(scope: cdk.Construct, id: string, props?: CognitoStackProps) {
+    constructor(scope: cdk.Construct, id: string, props: CognitoStackProps) {
         super(scope, id);
 
         // Nested stack that creates all the lambda functions.
@@ -80,27 +86,28 @@ export class CognitoStack extends cdk.Stack {
             //     from: 'info@monss.co',
             //     replyTo: 'info@monss.co'
             // }
+            
         });
 
-        /**
-         * If were given certificate and domain name, then add it to the user pool.
-         */
-        if (props?.certificate && props?.domainName && props?.hostedZone) {
-            const userPoolDomain = new cognito.UserPoolDomain(this, 'UserPoolDomain', {
+        this.userPool = userPool
+
+        const authDomainName = props.subDomain + '.' + props.domain
+
+        const userPoolDomain = new cognito.UserPoolDomain(this, 'UserPoolDomain', {
                 userPool,
                 customDomain: {
-                    certificate: props.certificate,
-                    domainName: props.domainName 
+                    certificate: props?.authCertificate,
+                    domainName: authDomainName 
                 }
             })
 
-            // new route53.ARecord(this, 'UserPoolCloudFrontAliasRecord', {
-            //     zone: props.hostedZone,
-            //     recordName: props.domainName,
-            //     target: route53.RecordTarget.fromAlias(new route53_targets.UserPoolDomainTarget(userPoolDomain)),
-            // });
+        this.userPoolDomain = userPoolDomain
 
-        }
+        new route53.ARecord(this, 'UserPoolCloudFrontAliasRecord', {
+            zone: props.hostedZone,
+            recordName: authDomainName,
+            target: route53.RecordTarget.fromAlias(new route53_targets.UserPoolDomainTarget(userPoolDomain)),
+        });
 
         const cfnUserPool = userPool.node.defaultChild as cognito.CfnUserPool;
 
@@ -116,8 +123,33 @@ export class CognitoStack extends cdk.Stack {
         const userPoolClient = new cognito.UserPoolClient(this, 'MyUserPoolClient', {
             generateSecret: true,
             userPool: userPool,
-            userPoolClientName: 'MyUserPoolClientName'
+            userPoolClientName: 'MyUserPoolClientName',
+
+            // 
+            supportedIdentityProviders: [
+                cognito.UserPoolClientIdentityProvider.COGNITO
+            ],
+            oAuth: {
+                callbackUrls: [
+                    'https://' + 'api.liveworks.app' + '/oauth2/idpresponse'
+                ],
+                flows: {
+                    authorizationCodeGrant: true
+                },
+                scopes: [
+                    {
+                        scopeName: 'openid'
+                    },
+                    {
+                        scopeName: 'email'
+                    }
+                ]
+            },
+            refreshTokenValidity: cdk.Duration.days(7)
         });
+
+        this.userPoolClient = userPoolClient
+
         const identityPool = new cognito.CfnIdentityPool(this, 'MyCognitoIdentityPool', {
             allowUnauthenticatedIdentities: false,
             cognitoIdentityProviders: [{

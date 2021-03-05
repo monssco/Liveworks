@@ -39,6 +39,15 @@ Infrastructure: CDK
 Auth: Cognito
 Database: RDS running postgres
 
+# Roadmap
+
+- Incorporate Cognito
+- Host sample frontend in bucket
+- Setup versioning (branch level, api level) (use semantic version)
+
+# Long term goals
+- setup automatic CI/CD, so that changes to master are pushed to production
+- Use Jenkins to automate code delivery & pipeline
 
 
 ## Useful commands

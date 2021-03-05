@@ -8,9 +8,11 @@ import * as route53 from '@aws-cdk/aws-route53'
 import * as acm from '@aws-cdk/aws-certificatemanager'
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import { ICertificate } from '@aws-cdk/aws-certificatemanager';
+import { ListenerAction, ListenerCondition } from '@aws-cdk/aws-elasticloadbalancingv2';
+import { UserPool, UserPoolClient, UserPoolDomain } from '@aws-cdk/aws-cognito';
 
 /**
- * Small problem, there is some kind of misconfiguration with the target group and the health check listener
+ * Small problem, there is some kind of misconfiguration with the target group and the health check listener (done, we have a health-check endpoint now)
  * This causes issues with the container as it get shut down almost immidietly
  * Don't use their higher level Application Load Balancer, 
  * switch to the FargateService instead
@@ -19,17 +21,20 @@ import { ICertificate } from '@aws-cdk/aws-certificatemanager';
  */
 
     interface APIStackProps {
+        certificate: acm.DnsValidatedCertificate
+        hostedZone: route53.IHostedZone
         domain: string
         subDomain: string
-        hostedZoneId: string
-        hostedZoneName: string
+        user?: {
+            Pool: UserPool
+            Client: UserPoolClient
+            Domain: UserPoolDomain
+        }
     }
 
 export class APIStack extends cdk.Stack {
 
-    public readonly certificate: ICertificate
     public readonly domainName: string
-    public readonly hostedZone: route53.IHostedZone
 
     constructor(scope: cdk.Construct, id: string, props: APIStackProps) {
         super(scope, id)
@@ -37,37 +42,8 @@ export class APIStack extends cdk.Stack {
         let domain = props.domain
         let subDomain = props.subDomain
 
-        let hostedZoneId= props.hostedZoneId
-        let zoneName = props.hostedZoneName
-
-
-        /**
-         * Route 53 zone from lookup
-         * is not working, so must pass in these hard coded values instead for now
-         * https://github.com/aws-samples/aws-cdk-examples/issues/238
-         * https://github.com/aws/aws-cdk/issues/5547
-         */
-        const zone = route53.HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
-            hostedZoneId,
-            zoneName
-        })
-
-        this.hostedZone = zone
-
         const domainName = subDomain + '.' + domain
 
-        /**
-         * This is where you can come to implement things like ssl 
-         * pinning in iOS or Android app.
-         */
-        const certificate = new acm.DnsValidatedCertificate(this, 'SiteCertificate', {
-            domainName,
-            subjectAlternativeNames: [domain],
-            hostedZone: zone,
-            region: 'us-east-1', // Cloudfront only checks this region for certificates.
-        });
-
-        this.certificate = certificate
         this.domainName = domainName
 
         const vpc = new ec2.Vpc(this, "MyVpc", {
@@ -116,8 +92,8 @@ export class APIStack extends cdk.Stack {
                 publicLoadBalancer: true, // Default is false
                 assignPublicIp: true,
                 domainName,
-                domainZone: zone,
-                certificate,
+                domainZone: props.hostedZone,
+                certificate: props.certificate,
         });
 
         /**
@@ -137,7 +113,104 @@ export class APIStack extends cdk.Stack {
 
         lbSecurityGroup.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443), 'Outbound HTTPS traffic to get to cognito')
 
-        alb.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '10') 
+        alb.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '10')
+
+        new elbv2.CfnListenerRule(this, 'LoadBalancertestAPIDispatchRule', {
+            priority: 30,
+            listenerArn: alb.listener.listenerArn,
+            conditions: [
+                {
+                    field: 'path-pattern',
+                    values: ['/secret']
+                }
+            ],
+            actions: [
+                {
+                    type:'authenticate-cognito',
+                    order: 100,
+                    authenticateCognitoConfig: {
+                        userPoolArn: props.user!.Pool.userPoolArn,
+                        userPoolClientId: props.user!.Client.userPoolClientId,
+                        userPoolDomain: props.user!.Domain.domainName,
+                        onUnauthenticatedRequest: 'deny'
+                    }
+                }, {
+                    type: 'forward',
+                    order: 200,
+                    targetGroupArn: alb.targetGroup.targetGroupArn
+                }
+            ]
+        })
+
+        new elbv2.CfnListenerRule(this, 'LoadBalancerAPIDispatchRule', {
+            priority: 20,
+            listenerArn: alb.listener.listenerArn,
+            conditions: [
+                {
+                    field: 'path-pattern',
+                    values: ['/graphql', '/graphql/*']
+                }
+            ],
+            actions: [
+                {
+                    type:'authenticate-cognito',
+                    order: 100,
+                    authenticateCognitoConfig: {
+                        userPoolArn: props.user!.Pool.userPoolArn,
+                        userPoolClientId: props.user!.Client.userPoolClientId,
+                        userPoolDomain: props.user!.Domain.domainName,
+                        onUnauthenticatedRequest: 'deny'
+                    }
+                }, {
+                    type: 'forward',
+                    order: 200,
+                    targetGroupArn: alb.targetGroup.targetGroupArn
+                }
+            ]
+        })
+
+        new elbv2.CfnListenerRule(this, 'LoadBalancerLoginDispatchRule', {
+            priority: 10,
+            listenerArn: alb.listener.listenerArn,
+            conditions: [
+                {
+                    field: 'path-pattern',
+                    values: ['/login']
+                }
+            ],
+            actions: [
+                {
+                    type:'authenticate-cognito',
+                    order: 100,
+                    authenticateCognitoConfig: {
+                        userPoolArn: props.user!.Pool.userPoolArn,
+                        userPoolClientId: props.user!.Client.userPoolClientId,
+                        userPoolDomain: props.user!.Domain.domainName,
+                        onUnauthenticatedRequest: 'authenticate'
+                    }
+                }, {
+                    type: 'forward',
+                    order: 200,
+                    targetGroupArn: alb.targetGroup.targetGroupArn
+                }
+            ]
+        })
+
+        // const apiDispatchRule = new elbv2.ApplicationListenerRule(this, 'apiRule', {
+        //     listener: alb.listener,
+        //     priority: 20,
+        //     conditions: [
+        //         ListenerCondition.pathPatterns(['/graphql/*']),
+        //     ],
+        //     action: ListenerAction.authenticateOidc({
+        //         authorizationEndpoint: "https://auth.liveworks.app",
+        //         clientId: '',
+        //         clientSecret: '',
+        //         issuer: '',
+        //         next: ,
+                
+        //     })
+        // })
 
         // const clientSecret = cdk.SecretValue.secretsManager('clientSecret', {})
 
