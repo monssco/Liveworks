@@ -23,7 +23,8 @@
   },
   "exclude": [
     "cdk.out",
-    "./lib/App/**/", // Ignore the api and web app
+    "lib/App/**/", // Ignore the api and web app
+    "lib/API/apollo/server/*",
     "build"
   ]
 }

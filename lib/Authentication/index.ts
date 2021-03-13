@@ -5,7 +5,7 @@ import * as iam from '@aws-cdk/aws-iam'
 import {CognitoLambda} from './Lambda/index'
 import { ICertificate } from '@aws-cdk/aws-certificatemanager';
 import * as route53 from '@aws-cdk/aws-route53';
-import * as route53_targets from '@aws-cdk/aws-route53-targets';
+
 
 // Most of stack copied from: https://stackoverflow.com/questions/55784746/how-to-create-cognito-identitypool-with-cognito-userpool-as-one-of-the-authentic
 
@@ -26,6 +26,8 @@ export class CognitoStack extends cdk.Stack {
     // These roles will be used across the app for accessing various resources.
     public readonly unauthenticatedRole: iam.Role
     public readonly authenticatedRole: iam.Role
+
+    public readonly userPool: cognito.IUserPool
 
     constructor(scope: cdk.Construct, id: string, props?: CognitoStackProps) {
         super(scope, id);
@@ -81,6 +83,8 @@ export class CognitoStack extends cdk.Stack {
             //     replyTo: 'info@monss.co'
             // }
         });
+
+        this.userPool = userPool
 
         /**
          * If were given certificate and domain name, then add it to the user pool.

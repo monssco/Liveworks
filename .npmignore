@@ -8,3 +8,4 @@ cdk.out
 # Ignore the api and web app, it will have its own npm packages
 lib/App/**/
 
+lib/API/**

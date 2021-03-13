@@ -1,9 +1,9 @@
-#!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
 import { CognitoStack } from '../lib/Authentication';
 import { RDSStack } from '../lib/Database';
 import { S3Stack } from '../lib/ObjectStorage';
-import { APIStack } from '../lib/App/index'
+import { APIStack } from '../lib/API/apollo/index'
+import AppSyncStack from '../lib/API/appsync';
 
 const app = new cdk.App();
 
@@ -23,15 +23,15 @@ let subDomain = 'api'
 let hostedZoneId= 'Z075356326HYDU3BBX4VW'
 let hostedZoneName = 'liveworks.app'
 
-const api = new APIStack(app, 'MyStack', {
-    domain,
-    subDomain,
-    hostedZoneName,
-    hostedZoneId
-})
+// const api = new APIStack(app, 'MyStack', {
+//     domain,
+//     subDomain,
+//     hostedZoneName,
+//     hostedZoneId
+// })
 
-const cognito = new CognitoStack(app, 'CognitoStack', {
-    certificate: api.certificate,
-    domainName: api.domainName,
-    hostedZone: api.hostedZone
+const cognito = new CognitoStack(app, 'CognitoStack')
+
+const appsync = new AppSyncStack(app, 'AppsyncStack', {
+    userPool: cognito.userPool
 })

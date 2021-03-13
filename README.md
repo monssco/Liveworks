@@ -4,13 +4,24 @@ Sample app repo for a full-stack TypeScript application.
 
 I want to develop things locally and push them out fast, while keeping costs down.
 
+## Reasoning
+Why am I switching back to AppSync? It seems that AppSync has evolved a lot since the cf days (although not quite there yet).
+
+I want to figure out if its worth switching over and using it for our project, since most of the schema and what not has already been created for us.
+
+Goal is to move all resolvers (business logic) into lambda functions.
+
+Change RDS with DynamoDB Database. (NOT a priority. Stick with RDS for now until everything is moved over.)
+
+Create a completely server-less environment where we don't even have a database running.
+
 ## High level image
 
     FRONTEND                        BACKEND
-User -> Rect App ->  (API) exposed via  ALB -> Fargate Cluster (Apollo + business logic) -> Database
-  |                                                                     |-> Stripe
- \ / 
-  .
+User -> Rect App ->  AppSync -> Database
+
+  |                       |-> Stripe
+
  Cognito
 
 ## Roadmap

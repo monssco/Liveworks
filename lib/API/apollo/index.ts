@@ -6,12 +6,10 @@ import path = require('path');
 import { Duration } from '@aws-cdk/core';
 import * as route53 from '@aws-cdk/aws-route53'
 import * as acm from '@aws-cdk/aws-certificatemanager'
-import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import { ICertificate } from '@aws-cdk/aws-certificatemanager';
 
 /**
- * Small problem, there is some kind of misconfiguration with the target group and the health check listener
- * This causes issues with the container as it get shut down almost immidietly
+ * Issue with health checks has been solved
  * Don't use their higher level Application Load Balancer, 
  * switch to the FargateService instead
  * Look at this code repo: https://github.com/markusl/cdk-fargate-docker-starter/blob/master/lib/fargate-docker-stack.ts

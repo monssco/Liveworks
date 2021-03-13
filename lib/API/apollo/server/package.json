@@ -27,7 +27,7 @@
       "type-graphql": "^1.1.1"
    },
    "mikro-orm": {
-    "useTsNode": true
+      "useTsNode": true
    },
    "scripts": {
       "prod": "cross-env NODE_ENV=production ts-node-dev --respawn --no-notify src/server.ts",
