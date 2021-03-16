@@ -3,6 +3,9 @@ import * as dynamo from '@aws-cdk/aws-dynamodb';
 import { IUserPool } from '@aws-cdk/aws-cognito';
 import * as cdk from '@aws-cdk/core';
 import { join } from 'path';
+import * as lambda from '@aws-cdk/aws-lambda';
+import path = require('path');
+import { LayerStack } from './Layers';
 
 interface AppsyncStackProps {
     userPool: IUserPool
@@ -18,11 +21,16 @@ export default class AppSyncStack extends cdk.Stack {
             schema: appsync.Schema.fromAsset(join(__dirname, 'schema.graphql')),
             authorizationConfig: {
                 defaultAuthorization: {
-                    authorizationType: appsync.AuthorizationType.USER_POOL,
-                    userPoolConfig: {
-                        userPool: props!.userPool
+                    authorizationType: appsync.AuthorizationType.API_KEY
+                },
+                additionalAuthorizationModes: [
+                    {
+                        authorizationType: appsync.AuthorizationType.USER_POOL,
+                        userPoolConfig: {
+                            userPool: props!.userPool
+                        }
                     }
-                }
+                ]
             },
             xrayEnabled: true
         })
@@ -57,5 +65,28 @@ export default class AppSyncStack extends cdk.Stack {
             responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultItem()
         })
 
+        const testLambda = new lambda.Function(this, 'test', {
+            functionName: 'TEST',
+            code: lambda.Code.fromAsset(path.join(__dirname, 'Lambda')),
+            handler: 'index.handler',
+            runtime: lambda.Runtime.NODEJS_14_X,
+            description: 'Test lambda for appsync',
+            environment : {
+                TABLE_NAME: demoTable.tableName
+            }
+        });
+
+        const lambdaDS = api.addLambdaDataSource('LambdadataSource', testLambda,
+        {
+            description: 'testinglambda',
+            name: 'mydatasource'
+        })
+
+        lambdaDS.createResolver({
+            typeName: 'Query',
+            fieldName: 'callLambda'
+        })
+
+        demoTable.grantReadWriteData(testLambda);
     }
 }

@@ -17,14 +17,12 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization":false,
-    "noEmit": true,
-    "typeRoots": ["./node_modules/@types"],
-    "outDir": "build/dist" // For some reason this isn't working, I can't see anything in the build directory.
+    "noEmitOnError": true,
+    "typeRoots": ["./node_modules/@types"]
   },
   "exclude": [
     "cdk.out",
     "lib/App/**/", // Ignore the api and web app
-    "lib/API/apollo/server/*",
-    "build"
+    "lib/API/apollo/server/*"
   ]
 }
