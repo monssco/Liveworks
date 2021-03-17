@@ -9,7 +9,7 @@ interface TestEntity {
     check: boolean;
 }
 
-export const handler = async (event: AppSyncResolverEvent<TestEntity>) => {
+export const handler = async (event: AppSyncResolverEvent<TestEntity>) : Promise<TestEntity> => {
   console.log('event', event);
 
   var params: DocumentClient.PutItemInput = {
@@ -28,5 +28,13 @@ export const handler = async (event: AppSyncResolverEvent<TestEntity>) => {
 
   console.log('res', JSON.stringify(res))
 
-	return res.$response;
+  console.log('')
+
+  const obj = {
+    id: event.arguments.id,
+    name: 'test',
+    check: true
+  }
+
+	return obj;
 }

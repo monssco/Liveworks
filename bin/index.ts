@@ -4,6 +4,7 @@ import { RDSStack } from '../lib/Database';
 import { S3Stack } from '../lib/ObjectStorage';
 import { APIStack } from '../lib/API/apollo/index'
 import AppSyncStack from '../lib/API/appsync';
+import DynamoDBStack from '../lib/Database/dynamoDB';
 
 const app = new cdk.App();
 
@@ -30,8 +31,11 @@ let hostedZoneName = 'liveworks.app'
 //     hostedZoneId
 // })
 
+const dynamoDB = new DynamoDBStack(app, 'DynamoDBStack')
+
 const cognito = new CognitoStack(app, 'CognitoStack')
 
 const appsync = new AppSyncStack(app, 'AppsyncStack', {
-    userPool: cognito.userPool
+    userPool: cognito.userPool,
+    userTable: dynamoDB.userTable
 })

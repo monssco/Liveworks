@@ -1,20 +1,19 @@
 import * as appsync from '@aws-cdk/aws-appsync';
-import * as dynamo from '@aws-cdk/aws-dynamodb';
+import * as dynamoDB from '@aws-cdk/aws-dynamodb';
 import { IUserPool } from '@aws-cdk/aws-cognito';
 import * as cdk from '@aws-cdk/core';
 import { join } from 'path';
 import * as lambda from '@aws-cdk/aws-lambda';
 import path = require('path');
-import { LayerStack } from './Layers';
 
 interface AppsyncStackProps {
     userPool: IUserPool
+    userTable?: dynamoDB.ITable
 }
 
 export default class AppSyncStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: AppsyncStackProps) {
         super(scope, id)
-
 
         const api = new appsync.GraphqlApi(this, 'API', {
             name: 'AppsyncAPI',
@@ -35,58 +34,74 @@ export default class AppSyncStack extends cdk.Stack {
             xrayEnabled: true
         })
 
+        if (!props?.userTable) {
+            throw new Error('No User Table specified.')
+        }
 
-        /**
-         * Temporary
-         */
-        const demoTable = new dynamo.Table(this, 'DemoTable', {
-            partitionKey: {
-                name: 'id',
-                type: dynamo.AttributeType.STRING,
+        createLambdaResolver({
+            appsync:{
+                api: api,
+                typeName: 'Query',
+                fieldName: 'callLambda'
             },
-        });
+            function: {
+                description: 'Function for updating user values',
+                handler: 'index.handler',
+                location: 'Lambda',
+                name: 'GetUserData'
+            },
+            datasource: {
+                table: props.userTable,
+                description: 'Datasource handling user retrieval.',
+                name: 'lamdaDS'
+            },
+            stack: this
+            })
+        }
+}
 
-        const demoDS = api.addDynamoDbDataSource('TabledataSource', demoTable);
-
-        demoDS.createResolver({
-            typeName: 'Query',
-            fieldName: 'getDemos',
-            requestMappingTemplate: appsync.MappingTemplate.dynamoDbScanTable(),
-            responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultList(),
-        });
-
-        demoDS.createResolver({
-            typeName: 'Mutation',
-            fieldName: 'addDemo',
-            requestMappingTemplate: appsync.MappingTemplate.dynamoDbPutItem(
-                appsync.PrimaryKey.partition('id').auto(),
-                appsync.Values.projecting('input')
-            ),
-            responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultItem()
-        })
-
-        const testLambda = new lambda.Function(this, 'test', {
-            functionName: 'TEST',
-            code: lambda.Code.fromAsset(path.join(__dirname, 'Lambda')),
-            handler: 'index.handler',
-            runtime: lambda.Runtime.NODEJS_14_X,
-            description: 'Test lambda for appsync',
-            environment : {
-                TABLE_NAME: demoTable.tableName
-            }
-        });
-
-        const lambdaDS = api.addLambdaDataSource('LambdadataSource', testLambda,
-        {
-            description: 'testinglambda',
-            name: 'mydatasource'
-        })
-
-        lambdaDS.createResolver({
-            typeName: 'Query',
-            fieldName: 'callLambda'
-        })
-
-        demoTable.grantReadWriteData(testLambda);
+interface LDRS {
+    stack: cdk.Stack
+    function: {
+        name: string
+        description: string
+        handler: string
+        location: string
     }
+    datasource: {
+        table: dynamoDB.ITable
+        description: string
+        name: string
+    }
+    appsync: {
+        api: appsync.IGraphqlApi
+        typeName: string
+        fieldName: string
+    }
+}
+
+
+function createLambdaResolver(props: LDRS) {
+    const lambdaFunction = new lambda.Function(props.stack, props.function.name, {
+        functionName: props.function.name,
+        code: lambda.Code.fromAsset(path.join(__dirname, props.function.location)),
+        handler: props.function.handler,
+        runtime: lambda.Runtime.NODEJS_14_X,
+        description: props.function.description,
+        environment : {
+            TABLE_NAME: props.datasource.table.tableName
+        },
+    });
+
+    const lambdaDS = props.appsync.api.addLambdaDataSource(props.datasource.description, lambdaFunction, {
+        description: props.datasource.description,
+        name: props.datasource.name
+    })
+
+    lambdaDS.createResolver({
+        typeName: props.appsync.typeName,
+        fieldName: props.appsync.fieldName
+    })
+
+    props.datasource.table.grantReadWriteData(lambdaFunction);
 }
