@@ -1,8 +1,19 @@
 # Base CDK Application Infrastructure
 
-Sample app repo for a full-stack TypeScript application.
+## Status: Paused
 
-I want to develop things locally and push them out fast, while keeping costs down.
+- Might come back just to use subscriptions from appsync, or use it just as a messaging API down the road.
+
+I decided not to purse this route for a number of reasons.
+
+- Lambda resolvers will add unnecessary latency
+- cdk-appsync is experimental, might cause issues down the road
+- No support for ORM in lambda functions (Lambda layers will not help us with sharing connections to DB)
+- Eventually I will need to use VTL at one point or another
+- Schema first approach means I will be repeating code
+- Business logic will need to be squeezed into lambda logic
+- Lambdas have concurrency limits
+- Need to pay for a cache
 
 ## Reasoning
 Why am I switching back to AppSync? It seems that AppSync has evolved a lot since the cf days (although not quite there yet).
