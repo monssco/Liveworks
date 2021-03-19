@@ -1,5 +1,5 @@
-import { PreSignUpTriggerEvent, PreSignUpTriggerHandler } from 'aws-lambda';
-const AWS = require('aws-sdk');
+import { PreSignUpTriggerHandler } from 'aws-lambda';
+import * as AWS from 'aws-sdk';
 var ses = new AWS.SES({region: 'us-east-1'});
 
 const documentClient = new AWS.DynamoDB.DocumentClient();
@@ -9,22 +9,21 @@ const userType = {
 	VENUE: "venue"
 };
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Context doc: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html 
- * @param {Object} context
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- * 
- */
-
- // There is some major fuckery going on in here. No need for half of this shit to be done. Remove it and clean it as you desire.
-
 export const handler: PreSignUpTriggerHandler  = async (event, context, callback) => {
+
+	// Auto verify user, just verify users when they sign up, speeds up development.
+	// Also there is no need to worry about such granular crap when first developing the app, we can just verify them ourselves.
+	event.response.autoConfirmUser = true
+
+	if (event.request.userAttributes.hasOwnProperty("email")) {
+		event.response.autoVerifyEmail = true
+	}
+
+	if (event.request.userAttributes.hasOwnProperty("phone_number")) {
+		event.response.autoVerifyPhone = true
+	}
+
+
 	// console.log( JSON.stringify(event, null, 0) );
 
 	// if( validate(event, callback) ) {

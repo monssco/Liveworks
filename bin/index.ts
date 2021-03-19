@@ -3,15 +3,21 @@ import * as cdk from '@aws-cdk/core';
 
 
 import { CognitoStack } from '../lib/Authentication';
-import { APIStack } from '../lib/App/index';
+import { APIStack } from '../lib/API/index';
 import { CertificateStack } from '../lib/Certificates';
 
 const app = new cdk.App();
 
 
-let domain = 'liveworks.app'
-let hostedZoneId= 'Z075356326HYDU3BBX4VW'
-let hostedZoneName = 'liveworks.app'
+/**
+ * Dev and Pros have different hosted zones.
+ * Might be a good idea to also have different sub domains for prod and dev.
+ */
+
+let domain = (process.env.NODE_ENV as string) === 'production' ? 'liveworks.app' : 'dev.liveworks.app'
+let hostedZoneId= (process.env.NODE_ENV as string) === 'production' ? 'Z075356326HYDU3BBX4VW' :'Z09276711TGY8X8UFUXOZ'
+let hostedZoneName = domain
+
 
 const certificate = new CertificateStack(app, 'CertificateStack', {
     domain,
@@ -30,17 +36,17 @@ const cognito = new CognitoStack(app, 'CognitoStack', {
     hostedZone: certificate.hostedZone
 })
 
-const api = new APIStack(app, 'APIStack', {
-    domain,
-    subDomain: 'api',
-    hostedZone: certificate.hostedZone,
-    certificate: certificate.wildCardCertificate,
-    user: {
-        Pool: cognito.userPool!,
-        Client: cognito.userPoolClient!,
-        Domain: cognito.userPoolDomain!
-    }
-})
+// const api = new APIStack(app, 'APIStack', {
+//     domain,
+//     subDomain: 'api',
+//     hostedZone: certificate.hostedZone,
+//     certificate: certificate.wildCardCertificate,
+//     user: {
+//         Pool: cognito.userPool!,
+//         Client: cognito.userPoolClient!,
+//         Domain: cognito.userPoolDomain!
+//     }
+// })
 
 
 // let authRole = cognito.authenticatedRole

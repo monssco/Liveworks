@@ -120,12 +120,12 @@ export class CognitoStack extends cdk.Stack {
             ],
             oAuth: {
                 callbackUrls: [
-                    'https://' + 'auth.liveworks.app' + '/oauth2/idpresponse',
-                    'https://auth.liveworks.app'
+                    'https://auth.' + props.domain + '/oauth2/idpresponse',
+                    'https://auth.' + props.domain
                 ],
                 logoutUrls: [
-                    'https://auth.liveworks.app/logout',
-                    'https://auth.liveworks.app/'
+                    'https://auth.' + props.domain + '/logout',
+                    'https://auth.'+ props.domain +'/'
                 ],
                 flows: {
                     authorizationCodeGrant: true,
@@ -145,56 +145,56 @@ export class CognitoStack extends cdk.Stack {
 
         this.userPoolClient = userPoolClient
 
-        const identityPool = new cognito.CfnIdentityPool(this, 'MyCognitoIdentityPool', {
-            allowUnauthenticatedIdentities: false,
-            cognitoIdentityProviders: [{
-                clientId: userPoolClient.userPoolClientId,
-                providerName: userPool.userPoolProviderName,
-            }]
-        });
+        // const identityPool = new cognito.CfnIdentityPool(this, 'MyCognitoIdentityPool', {
+        //     allowUnauthenticatedIdentities: false,
+        //     cognitoIdentityProviders: [{
+        //         clientId: userPoolClient.userPoolClientId,
+        //         providerName: userPool.userPoolProviderName,
+        //     }]
+        // });
 
-        this.unauthenticatedRole = new iam.Role(this, 'CognitoDefaultUnauthenticatedRole', {
-            assumedBy: new iam.FederatedPrincipal('cognito-identity.amazonaws.com', {
-                "StringEquals": { "cognito-identity.amazonaws.com:aud": identityPool.ref },
-                "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "unauthenticated" },
-            }, "sts:AssumeRoleWithWebIdentity"),
-        });
+        // this.unauthenticatedRole = new iam.Role(this, 'CognitoDefaultUnauthenticatedRole', {
+        //     assumedBy: new iam.FederatedPrincipal('cognito-identity.amazonaws.com', {
+        //         "StringEquals": { "cognito-identity.amazonaws.com:aud": identityPool.ref },
+        //         "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "unauthenticated" },
+        //     }, "sts:AssumeRoleWithWebIdentity"),
+        // });
         
-        this.unauthenticatedRole.addToPolicy(new iam.PolicyStatement({
-            effect: iam.Effect.ALLOW,
-            actions: [
-                "mobileanalytics:PutEvents",
-                "cognito-sync:*"
-            ],
-            resources: ["*"],
-        }));
+        // this.unauthenticatedRole.addToPolicy(new iam.PolicyStatement({
+        //     effect: iam.Effect.ALLOW,
+        //     actions: [
+        //         "mobileanalytics:PutEvents",
+        //         "cognito-sync:*"
+        //     ],
+        //     resources: ["*"],
+        // }));
 
 
-        this.authenticatedRole = new iam.Role(this, 'CognitoDefaultAuthenticatedRole', {
-            assumedBy: new iam.FederatedPrincipal('cognito-identity.amazonaws.com', {
-                "StringEquals": { "cognito-identity.amazonaws.com:aud": identityPool.ref },
-                "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "authenticated" },
-            }, "sts:AssumeRoleWithWebIdentity"),
-        });
+        // this.authenticatedRole = new iam.Role(this, 'CognitoDefaultAuthenticatedRole', {
+        //     assumedBy: new iam.FederatedPrincipal('cognito-identity.amazonaws.com', {
+        //         "StringEquals": { "cognito-identity.amazonaws.com:aud": identityPool.ref },
+        //         "ForAnyValue:StringLike": { "cognito-identity.amazonaws.com:amr": "authenticated" },
+        //     }, "sts:AssumeRoleWithWebIdentity"),
+        // });
 
-        this.authenticatedRole.addToPolicy(new iam.PolicyStatement({
-            effect: iam.Effect.ALLOW,
-            actions: [
-                "mobileanalytics:PutEvents",
-                "cognito-sync:*",
-                "cognito-identity:*"
-            ],
-            resources: ["*"],
-        }));
+        // this.authenticatedRole.addToPolicy(new iam.PolicyStatement({
+        //     effect: iam.Effect.ALLOW,
+        //     actions: [
+        //         "mobileanalytics:PutEvents",
+        //         "cognito-sync:*",
+        //         "cognito-identity:*"
+        //     ],
+        //     resources: ["*"],
+        // }));
 
 
-        const defaultPolicy = new cognito.CfnIdentityPoolRoleAttachment(this, 'DefaultValid', {
-            identityPoolId: identityPool.ref,
-            roles: {
-                'unauthenticated': this.unauthenticatedRole.roleArn,
-                'authenticated': this.authenticatedRole.roleArn
-            }
-        });
+        // const defaultPolicy = new cognito.CfnIdentityPoolRoleAttachment(this, 'DefaultValid', {
+        //     identityPoolId: identityPool.ref,
+        //     roles: {
+        //         'unauthenticated': this.unauthenticatedRole.roleArn,
+        //         'authenticated': this.authenticatedRole.roleArn
+        //     }
+        // });
 
         
         

@@ -1,7 +1,5 @@
 import { PostConfirmationTriggerHandler } from 'aws-lambda';
 const AWS = require('aws-sdk');
-const documentClient = new AWS.DynamoDB.DocumentClient();
-let sqs = new AWS.SQS();
 
 
 /**
@@ -15,27 +13,7 @@ let sqs = new AWS.SQS();
 export const handler:PostConfirmationTriggerHandler  = async (event, context, callback) => {
 	console.log(JSON.stringify(event, null));
 
-	try{
-		// read event from dynamodb
-		var presignupEvent = ( await documentClient.get({
-			TableName : process.env.PreSignUpEventBuffer,
-			Key: {
-				username: event.userName
-			}
-		}).promise() ) ['Item']['event'];
+	// Here, you can do things like inserting user into tables or sending onboarding messages etc.
 
-		// put that event onto the SQS Queue.
-
-		var params = {
-            MessageBody: JSON.stringify(presignupEvent), /* required */
-            QueueUrl: process.env.EventQueueURL /* required */
-        };
-
-		await sqs.sendMessage(params).promise();
-
-		return event;
-	}catch(error){
-		console.log('error', error);
-		return null;
-	}
+	return event;
 };
