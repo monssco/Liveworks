@@ -5,10 +5,6 @@ import { CustomMessageTriggerHandler } from 'aws-lambda';
 // For more information, visit:
 // https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-message.html
 
-
-'use strict';
-require('dotenv').config();
-
 export const handler: CustomMessageTriggerHandler = (event, context, callback) => {
     // Identify why was this function invoked
     if(event.triggerSource === "CustomMessage_SignUp") {
@@ -19,10 +15,11 @@ export const handler: CustomMessageTriggerHandler = (event, context, callback) =
         const { userName, region } = event
         const { clientId } = event.callerContext
         const { email } = event.request.userAttributes
-        const url = "https://www.liveworks.com"                                                                     // This will redirect the user to the website, where a universal links file will be hosted. It will then redirect the user to the ap.
+        const url = "https://www.liveworks.com"                                                                     // This will redirect the user to the website, where a universal links file will be hosted. It will then redirect the user to the ap
         const link = `<a href="${url}/confirm/${email}/${codeParameter}" target="_blank">here</a>`
         event.response.emailSubject = "Liveworks Verification Link"; // event.request.codeParameter
         event.response.emailMessage = `Thank you for signing up for Liveworks. Click ${link} to verify your email.`;
+        event.response.emailMessage = `Thanks for signing up. Your verification code is ${codeParameter}`
     } 
     
     else if (event.triggerSource === "CustomMessage_ResendCode") {
@@ -42,6 +39,8 @@ export const handler: CustomMessageTriggerHandler = (event, context, callback) =
         const link = `<a href="${url}/forgot/${email}/${codeParameter}" target="_blank">here</a>`
         event.response.emailSubject = "Forgot Password"; // event.request.codeParameter
         event.response.emailMessage = `Hi ${given_name},\nWe got a request to reset your password. Click ${link} to reset your password.`;
+        
+        event.response.emailMessage = `Hi ${given_name},\nWe recieved a request to reset your password.\nHere is the code ${codeParameter}. Please don't share this with anyone else.`
     }
     
     else {

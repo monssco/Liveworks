@@ -22,7 +22,7 @@ export class CognitoLambda extends cdk.NestedStack {
         const preSignUp = new lambda.Function(this, PRE_SIGN_UP, {
             code: lambda.Code.fromAsset(path.join(__dirname, PRE_SIGN_UP)),
             handler: 'index.handler',
-            runtime: lambda.Runtime.NODEJS_12_X,
+            runtime: lambda.Runtime.NODEJS_14_X,
             description: 'PreSignUp Lambda for Cognito',
         });
 
@@ -31,7 +31,7 @@ export class CognitoLambda extends cdk.NestedStack {
         const customMessage = new lambda.Function(this, CUSTOM_MESSAGE, {
             code: lambda.Code.fromAsset(path.join(__dirname, CUSTOM_MESSAGE)),
             handler: 'index.handler',
-            runtime: lambda.Runtime.NODEJS_12_X,
+            runtime: lambda.Runtime.NODEJS_14_X,
             description: 'Custom Message Lambda for Cognito',
         });
 
@@ -41,7 +41,7 @@ export class CognitoLambda extends cdk.NestedStack {
         const postConfirmation = new lambda.Function(this, POST_CONFIRMATION, {
             code: lambda.Code.fromAsset(path.join(__dirname, POST_CONFIRMATION)),
             handler: 'index.handler',
-            runtime: lambda.Runtime.NODEJS_12_X,
+            runtime: lambda.Runtime.NODEJS_14_X,
             description: 'Post Confirmation Lambda for Cognito',
         });
 
@@ -52,7 +52,7 @@ export class CognitoLambda extends cdk.NestedStack {
         const populateUsers = new lambda.Function(this, POPULATE_USERS, {
             code: lambda.Code.fromAsset(path.join(__dirname, POPULATE_USERS)),
             handler: 'index.handler',
-            runtime: lambda.Runtime.NODEJS_12_X,
+            runtime: lambda.Runtime.NODEJS_14_X,
             description: 'Populate User Lambda for Cognito',
         });
 
