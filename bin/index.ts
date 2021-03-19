@@ -36,17 +36,17 @@ const cognito = new CognitoStack(app, 'CognitoStack', {
     hostedZone: certificate.hostedZone
 })
 
-// const api = new APIStack(app, 'APIStack', {
-//     domain,
-//     subDomain: 'api',
-//     hostedZone: certificate.hostedZone,
-//     certificate: certificate.wildCardCertificate,
-//     user: {
-//         Pool: cognito.userPool!,
-//         Client: cognito.userPoolClient!,
-//         Domain: cognito.userPoolDomain!
-//     }
-// })
+const api = new APIStack(app, 'APIStack', {
+    domain,
+    subDomain: 'api',
+    hostedZone: certificate.hostedZone,
+    certificate: certificate.wildCardCertificate,
+    user: {
+        Pool: cognito.userPool!,
+        Client: cognito.userPoolClient!,
+        Domain: cognito.userPoolDomain!
+    }
+})
 
 
 // let authRole = cognito.authenticatedRole
