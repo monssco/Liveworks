@@ -10,6 +10,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@apollo/client": "^3.3.12",
+    "graphql": "^15.5.0",
     "react": "17.0.1",
     "react-native": "0.64.0"
   },
