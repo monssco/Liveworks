@@ -78,7 +78,7 @@ export class APIStack extends cdk.Stack {
          * If we are in production, let it sit on port 80.
          * Otherwise for development we can use port 8000.
          */
-        let port = process.env.NODE_ENV === 'production' ? 80 : 8000
+        let port = 80
 
         // Create a load-balanced Fargate service and make it public
         const alb = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "GraphQLAPI", {
