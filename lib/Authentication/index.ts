@@ -114,19 +114,12 @@ export class CognitoStack extends cdk.Stack {
             userPool: userPool,
             userPoolClientName: 'MyUserPoolClientName',
 
-            // 
             supportedIdentityProviders: [
                 cognito.UserPoolClientIdentityProvider.COGNITO
             ],
             oAuth: {
-                callbackUrls: [
-                    'https://auth.' + props.domain + '/oauth2/idpresponse',
-                    'https://auth.' + props.domain
-                ],
-                logoutUrls: [
-                    'https://auth.' + props.domain + '/logout',
-                    'https://auth.'+ props.domain +'/'
-                ],
+                callbackUrls: this.getCallbackURLs(props.domain),
+                logoutUrls: this.getLogoutURLs(props.domain),
                 flows: {
                     authorizationCodeGrant: true,
                     
@@ -198,5 +191,30 @@ export class CognitoStack extends cdk.Stack {
 
         
         
+    }
+
+    private getCallbackURLs(domain: string): string[] {
+        let array = []
+        array.push('http://localhost:3000/oauth2/idpresponse')
+        array.push('http://localhost:3000')
+        
+        if (process.env.NODE_ENV === 'production') {
+            array.push('https://auth.' + domain + '/oauth2/idpresponse')
+            array.push('https://auth.' + domain)
+        }
+
+        return array
+    }
+
+    private getLogoutURLs(domain: string): string[] {
+        let array = []
+        
+        array.push('http://localhost:3000/logout')
+        
+        if (process.env.NODE_ENV === 'production') {
+            array.push('https://auth.' + domain + '/logout')
+        }
+
+        return array
     }
 }

@@ -74,6 +74,11 @@ export class APIStack extends cdk.Stack {
             
         // })
 
+        /**
+         * If we are in production, let it sit on port 80.
+         * Otherwise for development we can use port 8000.
+         */
+        let port = process.env.NODE_ENV === 'production' ? 80 : 8000
 
         // Create a load-balanced Fargate service and make it public
         const alb = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "GraphQLAPI", {
@@ -83,9 +88,9 @@ export class APIStack extends cdk.Stack {
                 taskImageOptions: {
                     // This is where you can pass in environment variables to the container.
                     image: ecs.ContainerImage.fromAsset(path.resolve(__dirname, "server")),
-                    containerPort: 80,
+                    containerPort: port,
                     environment: {
-                        DB_HOST: 'http://68.145.64.93:5432' // This is the port on my laptop, in production it should be replaced with an rds instance or something else.
+                        DB_HOST: 'http://68.145.64.93:5432', // This is the port on my laptop, in production it should be replaced with an rds instance or something else.
                     }
                 },
                 memoryLimitMiB: 512, // Default is 512

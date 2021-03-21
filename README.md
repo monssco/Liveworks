@@ -21,6 +21,12 @@ Push onto cloud and run it using ECR, Fargate etc etc
 Authenticate it using Cognito (Figure out login, lougout, authenticated routes etc, just a basic app nothing crazy)
 Figure out how to mock cognito locally, so that local development doesn't get hindered.
 
+## Development
+
+All local development should be done from a single folder, docker-compose file describes everything you need to get it up and running. 
+
+That being said, I think that eventually I will be moving the App code to a separate repo and keeping just the infrastructure code here.
+
 
 ## Requirements
 Application requirements are documented elsewhere (Notion / OneNote).
@@ -32,7 +38,7 @@ something like Fargate (which I don't know too much about right now. But ill fig
 
 
 API: GraphQL
-ORM: TypeORM
+ORM: mikro-orm
 
 Infrastructure: CDK
 
