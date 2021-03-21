@@ -1,9 +1,22 @@
 version: '3'
 services:
+
+# postgres db
+  db:
+    container_name: postgres_database
+    image: "postgres:9.6.1"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: 'test'
+      POSTGRES_PASSWORD: 'test'
+      POSTGRES_DB: 'postgres'
+
 # graphql api
   api:
     container_name: graphql_api
     build: ./api
+    restart: always
     volumes: 
       - ./api:/api
     ports: 
@@ -12,11 +25,16 @@ services:
       - db
     environment:
       DB_HOST: 'http://db:5432'
+      DB_NAME: 'postgres'
+      DB_PORT: '5432'
+      DB_USER: 'test'
+      DB_PASS: 'test'
 
 # React app
   app:
     container_name: react_app
     build: ./app
+    restart: always
     volumes:
       - ./app/src:/app/src
     ports: 
@@ -25,13 +43,3 @@ services:
       - api
     environment: 
       CHOKIDAR_USEPOLLING: "true"
-
-  db:
-    container_name: postgres_database
-    image: "postgres:9.6.1"
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: "test"
-      POSTGRES_PASSWORD: "test"
-      POSTGRES_DB: "postgres"

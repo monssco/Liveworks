@@ -90,7 +90,11 @@ export class APIStack extends cdk.Stack {
                     image: ecs.ContainerImage.fromAsset(path.resolve(__dirname, "server")),
                     containerPort: port,
                     environment: {
-                        DB_HOST: 'http://68.145.64.93:5432', // This is the port on my laptop, in production it should be replaced with an rds instance or something else.
+                        DB_HOST: process.env.DB_HOST,
+                        DB_NAME: process.env.DB_NAME,
+                        DB_PORT: process.env.DB_PORT,
+                        DB_USER: process.env.DB_USER,
+                        DB_PASS: process.env.DB_PASS
                     }
                 },
                 memoryLimitMiB: 512, // Default is 512
