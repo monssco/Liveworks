@@ -1,0 +1,30 @@
+/*! purgecss start ignore */
+@import "tailwindcss/base";
+
+nav a {
+  @apply font-medium; 
+  @apply text-lg; 
+  @apply text-gray-500;
+  @apply hover:text-gray-900;
+}
+
+nav a.active {
+  @apply font-medium; 
+  @apply text-lg; 
+  @apply text-black;
+  @apply hover:text-gray-900;
+}
+
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@font-face {
+  font-family: 'william';
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/WilliamRegular-Italic.woff2") format("woff2");
+}
+
+
+@import 'swiper/swiper.scss';
+@import 'swiper/components/pagination/pagination.scss';

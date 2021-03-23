@@ -11,6 +11,6 @@ RUN npm install
 # Bundle app source
 COPY . /app
 
-EXPOSE 3000
+EXPOSE 8000 9000
 
-CMD npm run start
+CMD npm run develop

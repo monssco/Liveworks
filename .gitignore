@@ -9,3 +9,10 @@ cdk.out
 
 # Ignore environment variable files
 *.env
+
+# don't apply gitignore on server and app
+!lib/API/app/*
+!lib/API/api/*
+
+# Mac OS
+.DS_Store

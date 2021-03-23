@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="394px" height="460px" viewBox="0 0 394 460" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>design</title>
+    <g id="Welcome" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Home" transform="translate(-570.000000, -191.000000)">
+            <g id="design" transform="translate(570.000000, 191.000000)">
+                <path d="M245,210 L394,210 L394,210 L394,360 C394,415.228475 349.228475,460 294,460 L145,460 L145,460 L145,310 C145,254.771525 189.771525,210 245,210 Z" id="Rectangle" fill="#A1B7E0"></path>
+                <path d="M100,75 L270,75 L270,75 L270,246 C270,301.228475 225.228475,346 170,346 L0,346 L0,346 L0,175 C-6.76353751e-15,119.771525 44.771525,75 100,75 Z" id="Rectangle" fill="#DFCD88"></path>
+                <path d="M197,0 L334,0 C367.137085,-6.08718376e-15 394,26.862915 394,60 L394,198 C394,231.137085 367.137085,258 334,258 L197,258 C163.862915,258 137,231.137085 137,198 L137,60 C137,26.862915 163.862915,-8.12367096e-15 197,0 Z" id="Rectangle" fill="#D2925D" transform="translate(265.500000, 129.000000) scale(-1, 1) translate(-265.500000, -129.000000) "></path>
+            </g>
+        </g>
+    </g>
+</svg>
