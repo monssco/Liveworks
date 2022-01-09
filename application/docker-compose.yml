@@ -15,12 +15,12 @@ services:
       POSTGRES_DB: 'postgres'
 
 # graphql api
-  api:
-    container_name: graphql_api
-    build: ./api
+  backend:
+    container_name: backend_liveworks
+    build: ./backend
     restart: always
     volumes: 
-      - ./api:/api
+      - ./backend:/backend
       - images:/images
     ports: 
       - "4000:4000"
@@ -45,16 +45,16 @@ services:
       - "8080:80"
 
 # React app
-  app:
-    container_name: react_app
-    build: ./app
+  frontend:
+    container_name: frontend_liveworks
+    build: ./frontend
     restart: always
     volumes:
-      - ./app:/app
+      - ./frontend:/frontend
     ports: 
       - "3000:3000"
     depends_on:
-      - api
+      - backend
     environment: 
       CHOKIDAR_USEPOLLING: "true"
 
