@@ -1,0 +1,7 @@
+mutation businessCreatePosition ($input: CreatePositionInput!) {
+    businessCreatePosition(input: $input) {
+        id
+        name
+        color
+    }
+}

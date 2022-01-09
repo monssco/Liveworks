@@ -1,0 +1,9 @@
+query listWorkerPositions {
+    businessListWorkerPositions{
+        id
+        name
+        rank
+        color
+        public
+    }
+}

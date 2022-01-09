@@ -1,0 +1,6 @@
+.git
+**/node_modules
+.idea
+.vscode
+
+src/orm/migrations

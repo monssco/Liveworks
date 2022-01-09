@@ -1,0 +1,13 @@
+version: '3'
+services:
+
+# postgres db
+  db_test:
+    container_name: postgres_database_test
+    image: "postgres:14.0"
+    ports:
+      - "2345:5432"
+    environment:
+      POSTGRES_USER: 'test'
+      POSTGRES_PASSWORD: 'test'
+      POSTGRES_DB: 'postgres-test'

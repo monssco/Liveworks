@@ -1,0 +1,9 @@
+query BusinessProfileQuery {
+  retrieveBusiness {
+    id
+    email
+    profile_picture
+    city
+    address
+  }
+}

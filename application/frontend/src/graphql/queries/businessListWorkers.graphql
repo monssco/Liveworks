@@ -1,0 +1,16 @@
+query businessListWorkers ($i: ListWorkersInput! ){
+businessListWorkers(input: $i){
+        id
+        first_name
+        last_name
+        position {
+            id
+            name
+            color
+        }
+        email
+        confirmed
+        profile_picture
+        invited
+    }
+}

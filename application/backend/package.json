@@ -1,0 +1,59 @@
+{
+  "name": "liveworks-backend",
+  "version": "0.0.1",
+  "description": "Apollo server developed in TypeScript.",
+  "author": "Munib Sonny Rahman",
+  "private": true,
+  "devDependencies": {
+    "@types/cron": "^1.7.3",
+    "@types/faker": "^5.5.8",
+    "@types/graphql-upload": "^8.0.7",
+    "@types/node": "^16.10.3",
+    "@types/nodemailer": "^6.4.4",
+    "@types/pg": "^8.6.1",
+    "@types/uuid": "^8.3.1",
+    "cross-env": "^7.0.3",
+    "mikro-orm": "^4.5.9",
+    "ts-node": "10.3.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.36.0",
+    "@mikro-orm/core": "^4.5.9",
+    "@mikro-orm/postgresql": "^4.5.9",
+    "apollo-server-core": "^3.4.0",
+    "apollo-server-express": "^3.4.0",
+    "calendar-link": "^2.1.1",
+    "class-validator": "^0.13.1",
+    "cors": "^2.8.5",
+    "cron": "^1.8.2",
+    "date-fns": "^2.25.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "faker": "^5.5.3",
+    "graphql": "^15.6.1",
+    "graphql-tools": "^8.2.0",
+    "graphql-type-json": "^0.3.2",
+    "graphql-upload": "^12.0.0",
+    "handlebars": "^4.7.7",
+    "jwt-decode": "^3.1.2",
+    "nodemailer": "^6.7.0",
+    "pg": "^8.7.1",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1",
+    "uuid": "^8.3.2"
+  },
+  "mikro-orm": {
+    "useTsNode": true
+  },
+  "scripts": {
+    "prod": "cross-env NODE_ENV=production ts-node-dev --respawn --no-notify src/server.ts",
+    "dev": "cross-env NODE_ENV=development ts-node-dev --debug --exit-child src/server.ts",
+    "db:setup": "ts-node ./src/test-utils/setup.ts",
+    "test": "npm run db:setup && jest --runInBand --detectOpenHandles --forceExit",
+    "migrate": "npx mikro-orm migration:create",
+    "migrate-up": "npx mikro-orm migration:up",
+    "migrate-down": "npx mikro-orm migration:down"
+  }
+}

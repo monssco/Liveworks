@@ -1,0 +1,12 @@
+mutation businessInviteWorkerToApp ($i: InviteWorkerInput!){
+    businessInviteWorkerToApp(input: $i){
+        id
+        first_name
+        last_name
+        email
+        position{
+        id
+        name
+        }
+    }
+}

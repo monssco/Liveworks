@@ -1,0 +1,11 @@
+mutation businessUpdateShift($input: UpdateShiftInput!){
+  businessUpdateShift(input: $input){
+    id
+    day {
+      id
+    }
+    start_time
+    end_time
+    
+  }
+}

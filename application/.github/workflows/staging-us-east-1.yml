@@ -1,0 +1,45 @@
+# This basic workflow will deploy the latest code to the pipeline.
+
+name: Staging CD
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push our pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+
+  # Deploying code to the pipeline.
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Transfer files via ssh to server
+        uses: appleboy/scp-action@master
+        with:
+          host: 3.220.89.126
+          username: ec2-user
+          port: 22
+          key: ${{ secrets.STAGING_SSH_PRIVATE_KEY }} # from github secrets
+          source: "*" # copy all files
+          target: "/home/ec2-user/application" # directory inside the server
+          rm: true # remove the target folder before uploading it
+
+      - name: Execute docker commands to start pipeline
+        uses: appleboy/ssh-action@master
+        with:
+          host: 3.220.89.126
+          username: ec2-user
+          port: 22
+          key: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
+          script: |
+            cd application
+            docker-compose down
+            docker-compose -f docker-compose.prod.yml up -d --build

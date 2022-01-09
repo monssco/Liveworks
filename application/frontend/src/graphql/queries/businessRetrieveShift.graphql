@@ -1,0 +1,29 @@
+
+query businessRetrieveShift($id: String!){
+  businessRetrieveShift(id: $id) {
+    id
+    day{
+      id
+      date
+    }
+    position {
+      id
+      name
+      color
+    }
+    start_time
+    end_time
+    shiftInvites {
+      id
+      worker {
+        id
+        first_name
+        last_name
+        profile_picture
+      }
+    }
+    notes
+    rate
+    address
+  }
+}

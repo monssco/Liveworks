@@ -1,0 +1,55 @@
+{
+  "name": "liveworks",
+  "private": true,
+  "description": "Frontend app built in nextjs",
+  "version": "0.1.0",
+  "author": "Munib Sonny Rahman",
+  "dependencies": {
+    "@stripe/react-stripe-js": "^1.4.1",
+    "@stripe/stripe-js": "^1.15.0",
+    "@types/react-helmet": "^6.1.1",
+    "@types/swiper": "^5.4.2",
+    "axios": "^0.21.1",
+    "date-fns": "^2.22.1",
+    "formik": "^2.2.9",
+    "google-map-react": "^2.1.9",
+    "graphql": "^15.5.0",
+    "next": "^10.2.3",
+    "next-auth": "^3.26.1",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-datepicker": "^4.1.1",
+    "react-dom": "^17.0.2",
+    "react-helmet": "^6.1.0",
+    "react-slick": "^0.28.1",
+    "react-toastify": "^7.0.4",
+    "slick-carousel": "^1.8.1",
+    "swiper": "^6.7.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "1.21.5",
+    "@graphql-codegen/introspection": "1.18.2",
+    "@graphql-codegen/typescript": "1.22.1",
+    "@graphql-codegen/typescript-graphql-files-modules": "1.18.1",
+    "@graphql-codegen/typescript-graphql-request": "^3.2.1",
+    "@graphql-codegen/typescript-operations": "^1.18.0",
+    "@graphql-codegen/typescript-react-apollo": "^2.2.5",
+    "@types/google-map-react": "^2.1.1",
+    "@types/react-datepicker": "^3.1.8",
+    "@types/react-slick": "^0.23.4",
+    "autoprefixer": "^10.2.6",
+    "postcss": "^8.3.2",
+    "prettier": "2.3.1",
+    "tailwindcss": "^2.1.4"
+  },
+  "keywords": [
+    "next"
+  ],
+  "license": "0BSD",
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "start": "next start",
+    "codegen": "graphql-codegen --config ./src/graphql/codegen.yml"
+  }
+}
